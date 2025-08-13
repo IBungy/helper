@@ -11,7 +11,7 @@ def main():
     prompt_tokens = response.usage_metadata.prompt_token_count
     response_tokens = response.usage_metadata.candidates_token_count
     print(response.text)
-    print(f"Prompt token: {prompt_tokens}")
+    print(f"Prompt tokens: {prompt_tokens}")
     print(f"Response tokens: {response_tokens}")
 
 
