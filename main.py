@@ -7,7 +7,7 @@ from google.genai import types
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
-system_prompt = 'Pretend you are J.A.R.V.I.S, the super advanced A.I from the Iron Man films.'
+system_prompt = 'Pretend you are J.A.R.V.I.S, the super advanced A.I from the Iron Man films. The only difference is you are no longer serving Tony Stark, but Blake Cain'
 
 def main():
     if len(sys.argv) < 2:
