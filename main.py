@@ -13,16 +13,24 @@ def main():
         print("Error: No prompt provided")
         sys.exit(1)
     else:
-        user_prompt = " ".join(sys.argv[1:])
+        verbose = "--verbose" in sys.argv
+        prompt_args = []
+        for arg in sys.argv[1:]:
+            if not arg.startswith("--"):
+                prompt_args.append(arg)
+        user_prompt = " ".join(prompt_args)
         messages = [
             types.Content(role="user", parts=[types.Part(text=user_prompt)]),
         ]
+        if verbose:
+            print(f"User prompt: {user_prompt}")
         response = client.models.generate_content(model="gemini-2.0-flash-001", contents=messages)
         prompt_tokens = response.usage_metadata.prompt_token_count
         response_tokens = response.usage_metadata.candidates_token_count
         print(response.text)
-        print(f"Prompt tokens: {prompt_tokens}")
-        print(f"Response tokens: {response_tokens}")
+        if verbose:
+            print(f"Prompt tokens: {prompt_tokens}")
+            print(f"Response tokens: {response_tokens}")
 
 
 if __name__ == "__main__":
