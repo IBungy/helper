@@ -10,8 +10,10 @@ client = genai.Client(api_key=api_key)
 def main():
     if len(sys.argv) < 2:
         print("Error: No prompt provided")
+        sys.exit(1)
     else:
-        response = client.models.generate_content(model="gemini-2.0-flash-001", contents="sys.argv")
+        prompt = " ".join(sys.argv[1:])
+        response = client.models.generate_content(model="gemini-2.0-flash-001", contents=prompt)
         prompt_tokens = response.usage_metadata.prompt_token_count
         response_tokens = response.usage_metadata.candidates_token_count
         print(response.text)
