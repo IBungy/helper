@@ -60,7 +60,7 @@ def main():
                 if response.function_calls:
                     for function_call in response.function_calls:
                         function_response = call_function(function_call, verbose=verbose)
-                        messages.append(types.Content(role="user", parts=[function_response]))
+                        messages.append(function_response)
                         if function_response and \
                             function_response.parts and \
                             len(function_response.parts) > 0 and \
