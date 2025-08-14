@@ -7,6 +7,7 @@ from functions.get_files_info import schema_get_files_info, get_files_info
 from functions.get_file_content import schema_get_file_content, get_file_content
 from functions.run_python import schema_run_python_file, run_python_file
 from functions.write_file import schema_write_file, write_file
+from call_function import call_function, available_functions
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -53,7 +54,15 @@ def main():
         response_tokens = response.usage_metadata.candidates_token_count
         if response.function_calls:
             for function_call in response.function_calls:
-                print(f"Calling function: {function_call.name}({function_call.args})")
+                function_response = call_function(function_call, verbose=verbose)
+                if function_response and \
+                    function_response.parts and \
+                    len(function_response.parts) > 0 and \
+                    function_response.parts[0].function_response and \
+                    function_response.parts[0].function_response.response:
+                        print(f"-> {function_response.parts[0].function_response.response}")
+                else:
+                    raise Exception("Malformed function response: expected .parts[0].function_response.response")
         else:
             print(response.text)
 
