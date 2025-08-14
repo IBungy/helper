@@ -49,30 +49,41 @@ def main():
         ]
         if verbose:
             print(f"User prompt: {user_prompt}")
-        response = client.models.generate_content(model="gemini-2.0-flash-001", contents=messages, config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt),)
-        prompt_tokens = response.usage_metadata.prompt_token_count
-        response_tokens = response.usage_metadata.candidates_token_count
-        if response.function_calls:
-            for function_call in response.function_calls:
-                function_response = call_function(function_call, verbose=verbose)
-                if function_response and \
-                    function_response.parts and \
-                    len(function_response.parts) > 0 and \
-                    function_response.parts[0].function_response and \
-                    function_response.parts[0].function_response.response:
-                        result_dict = function_response.parts[0].function_response.response
-                        if 'result' in result_dict:
-                            print(result_dict['result'])
+        count = 0
+        while count < 20:
+            try:
+                response = client.models.generate_content(model="gemini-2.0-flash-001", contents=messages, config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt),)
+                for candidate in response.candidates:
+                    messages.append(candidate.content)
+                prompt_tokens = response.usage_metadata.prompt_token_count
+                response_tokens = response.usage_metadata.candidates_token_count
+                if response.function_calls:
+                    for function_call in response.function_calls:
+                        function_response = call_function(function_call, verbose=verbose)
+                        messages.append(types.Content(role="user", parts=[function_response]))
+                        if function_response and \
+                            function_response.parts and \
+                            len(function_response.parts) > 0 and \
+                            function_response.parts[0].function_response and \
+                            function_response.parts[0].function_response.response:
+                                result_dict = function_response.parts[0].function_response.response
+                                
                         else:
-                            print(result_dict)
+                            raise Exception("Malformed function response: expected .parts[0].function_response.response")
                 else:
-                    raise Exception("Malformed function response: expected .parts[0].function_response.response")
-        else:
-            print(response.text)
+                    print(response.text)
+                    break
 
-        if verbose:
-            print(f"Prompt tokens: {prompt_tokens}")
-            print(f"Response tokens: {response_tokens}")
+                if verbose:
+                    print(f"Prompt tokens: {prompt_tokens}")
+                    print(f"Response tokens: {response_tokens}")
+                
+                count += 1
+            
+            except Exception as e:
+                return f"Error: {str(e)}"
+
+
 
 
 if __name__ == "__main__":
