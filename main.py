@@ -60,7 +60,11 @@ def main():
                     len(function_response.parts) > 0 and \
                     function_response.parts[0].function_response and \
                     function_response.parts[0].function_response.response:
-                        print(f"-> {function_response.parts[0].function_response.response}")
+                        result_dict = function_response.parts[0].function_response.response
+                        if 'result' in result_dict:
+                            print(result_dict['result'])
+                        else:
+                            print(result_dict)
                 else:
                     raise Exception("Malformed function response: expected .parts[0].function_response.response")
         else:
